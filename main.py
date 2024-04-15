@@ -10,7 +10,7 @@ import json
 #Loading User settings
 subreddits = open('subreddits.cfg', 'r').read().replace(' ', '').split('\n')
 for a in subreddits:
-    if a[0] == '#':
+    if a == '' or a[0] == '#':
         subreddits.remove(a)
         
 reddit.subreddits = subreddits
