@@ -2,3 +2,5 @@
 __pycache__
 .cfg
 logs/
+subreddits.cfg
+modules/telegramm.db
