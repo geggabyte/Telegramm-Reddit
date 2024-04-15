@@ -2,7 +2,9 @@ Telegrammreddit
 
 This is telegramm bot for reposting from reddit.
 
-To properly utilize you will need to create `.cfg` file near `main.py` with following content:
+File `subreddits.cfg` should be filled with subreddits from which app will grab posts. Subreddists should be without `r/` and sepparated by new line. Additionally for "convenience" you can use # as a comments.
+
+To run the programm you will need to create `.cfg` file near `main.py` with following content:
 
 ```
 {
@@ -15,6 +17,18 @@ To properly utilize you will need to create `.cfg` file near `main.py` with foll
 }
 ```
 
-After you can run `main.py`. Logs with all relevant (or not) data will appear inside `logs/debug.log` file.
+After you can run `main.py`. Logs with all relevant (or not) data will appear inside `logs/info.log` file.
 
-File `usefull.sql` provides with all the querries that you will need to use bot. You can use [DBeaver](https://dbeaver.io/) to run those.
+
+```
+-- Shows all posts sorted by subredit
+select * from reddit_posts rp order by subreddit
+
+-- Cleans history of posts
+delete from reddit_posts
+```
+
+`telegramm.db` is SQLite data base containing history of all posts made. You can use [DBeaver](https://dbeaver.io/) to access it.
+
+
+`start.sh` and `log.sh` are for running app with update & keeping eye on logs inside console.

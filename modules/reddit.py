@@ -1,4 +1,4 @@
-import telegram
+import modules.telegram as telegram
 import requests
 import requests.auth
 import logging
@@ -8,23 +8,20 @@ import time
 
 logging.basicConfig(filename='logs/info.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s')
 config = {"t" : 1}
+subreddits = {}
 
-def setConfig(c):
-    telegram.telegramBase = f'https://api.telegram.org/{c["telegramm_bot_id"]}/'
-    telegram.chanelId = f'chat_id=@{c["telegramm_chat_id"]}' #this is PROD chanel id. change to test one for experementall purposes
+def setConfig():
+    telegram.telegramBase = f'https://api.telegram.org/{config["telegramm_bot_id"]}/'
+    telegram.chanelId = f'chat_id=@{config["telegramm_chat_id"]}' #this is PROD chanel id. change to test one for experementall purposes
 
 def fetch():
-    db = sqlite3.connect("telegramm.db")
+    db = sqlite3.connect("modules/telegramm.db")
     dbcursor = db.cursor()
 
     posts = []
-
-    res = dbcursor.execute("SELECT name FROM subreddits")
-    subreddits = res.fetchall()
     headers = connect()
 
     for subreddit in subreddits:
-        
         response = getPosts(subreddit, headers)
 
         for a in response.json()['data']['children'][:6]:
@@ -75,7 +72,7 @@ def connect():
 
 def getPosts(subreddit, headers):
     try:
-        return requests.get(f"https://oauth.reddit.com/r/{subreddit[0]}/top?t=hour&before:t5_{subreddit[0]}", headers=headers)
+        return requests.get(f"https://oauth.reddit.com/r/{subreddit}/top?t=hour&before:t5_{subreddit}", headers=headers)
     except Exception as error:
         logging.info(f"Error occured while trying to reach subbreddit:\n {error}")
         return getPosts(subreddit, headers)

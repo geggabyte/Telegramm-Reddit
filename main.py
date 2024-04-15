@@ -1,5 +1,5 @@
 import logging
-import reddit
+import modules.reddit as reddit
 import time
 import json
 
@@ -8,9 +8,14 @@ import json
 #Reddit:        https://www.reddit.com/dev/api/#listings
 
 #Loading User settings
-config = json.loads(open(".cfg", "r").read())
-reddit.config = config
-reddit.setConfig(config)
+subreddits = open('subreddits.cfg', 'r').read().replace(' ', '').split('\n')
+for a in subreddits:
+    if a[0] == '#':
+        subreddits.remove(a)
+        
+reddit.subreddits = subreddits
+reddit.config = json.loads(open(".cfg", "r").read())
+reddit.setConfig()
     
 
 logging.basicConfig(filename='logs/info.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s')
