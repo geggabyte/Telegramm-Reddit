@@ -11,8 +11,9 @@ import json
 config = json.loads(open(".cfg", "r").read())
 reddit.config = config
 reddit.setConfig(config)
+    
 
-logging.basicConfig(filename='logs/debug.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='logs/info.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s')
 timer = 60
 
 while True:

@@ -6,7 +6,7 @@ import sqlite3
 import random
 import time
 
-logging.basicConfig(filename='logs/debug.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
+logging.basicConfig(filename='logs/info.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s')
 config = {"t" : 1}
 
 def setConfig(c):

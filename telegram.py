@@ -1,7 +1,13 @@
 import requests
 import logging
+import os
 
-logging.basicConfig(filename='logs/debug.log', encoding='utf-8', level=logging.DEBUG, format='%(asctime)s %(message)s')
+path = 'logs/info.log'
+if not os.path.isfile(path):
+    os.mkdir('logs')
+    open(path, "w")
+
+logging.basicConfig(filename=path, encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s')
 telegramBase = ""
 chanelId = ""
 html = "&parse_mode=HTML"
