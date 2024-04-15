@@ -1,5 +1,5 @@
 #!/bin/sh
 
-git reset --hard
+git clean -df
 git pull
 python3 main.py
