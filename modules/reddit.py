@@ -57,10 +57,12 @@ def fetch():
             telegram.postWithPhoto(text, data['url'])
         else:
             telegram.postText(text)
+
+        db.commit()
+        
         sleep_time = random.randint(20, 40)
         logging.info(f'Sleeping {sleep_time} sec between posting')
         time.sleep(sleep_time)
-    db.commit()
 
 
 def connect():
