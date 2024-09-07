@@ -10,6 +10,9 @@ logging.basicConfig(filename='logs/info.log', encoding='utf-8', level=logging.IN
 config = {"t" : 1}
 subreddits = {}
 
+old_time_to_reset = 1
+old_remaining = 0
+
 def setConfig():
     telegram.telegramBase = f'https://api.telegram.org/{config["telegramm_bot_id"]}/'
     telegram.chanelId = f'chat_id=@{config["telegramm_chat_id"]}' #this is PROD chanel id. change to test one for experementall purposes
@@ -23,12 +26,24 @@ def fetch():
 
     for subreddit in subreddits:
         response = getPosts(subreddit, headers)
-
+        logging.info(f'Reddit responded wih:\n{response}')
         for a in response.json()['data']['children'][:6]:
             posts.append(a)
+            
+        if 'X-Ratelimit-Remaining' in response.headers:
+            remaining = response.headers['X-Ratelimit-Remaining']
+            old_remaining = remaining
+        else:
+            logging.info('Response didn\'t contain \'X-Ratelimit-Remaining\' header. Using old one.')
+            remaining = old_remaining - 1
         
-        remaining = response.headers['X-Ratelimit-Remaining']
-        time_to_reset = response.headers['X-Ratelimit-Reset']
+        if 'X-Ratelimit-Reset' in response.headers:
+            time_to_reset = response.headers['X-Ratelimit-Reset']
+            old_time_to_reset = time_to_reset
+        else:
+            logging.info('Response didn\'t contain \'X-Ratelimit-Reset\' header. Using old one.')
+            time_to_reset = old_time_to_reset
+
         if float(remaining) < 2:
             logging.info(f'I have {remaining} requests left for {time_to_reset} seconds, waiting for it')
             time.sleep(float(time_to_reset))
@@ -44,7 +59,7 @@ def fetch():
         id = data['id']
         res = dbcursor.execute(f"SELECT post_id FROM reddit_posts WHERE post_id = '{id}'")
         if res.fetchone() is not None:
-            logging.info('Post already utilized. Continue')
+            logging.info(f'Post {id} already utilized. Continue')
             continue
 
         author = data['author'].replace("'", "''")
@@ -57,12 +72,11 @@ def fetch():
             telegram.postWithPhoto(text, data['url'])
         else:
             telegram.postText(text)
-
-        db.commit()
-        
-        sleep_time = random.randint(20, 40)
+        sleep_time = random.randint(30, 90)
         logging.info(f'Sleeping {sleep_time} sec between posting')
         time.sleep(sleep_time)
+    db.commit()
+    logging.info('Cycle finished')
 
 
 def connect():
@@ -76,5 +90,5 @@ def getPosts(subreddit, headers):
     try:
         return requests.get(f"https://oauth.reddit.com/r/{subreddit}/top?t=hour&before:t5_{subreddit}", headers=headers)
     except Exception as error:
-        logging.info(f"Error occured while trying to reach subbreddit:\n {error}")
+        logging.info(f"Error occured while trying to reach subbreddit {subreddit}:\n {error}")
         return getPosts(subreddit, headers)
